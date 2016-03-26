@@ -3,6 +3,7 @@ package com.spring.scaffolding.pojo;
 import com.squareup.javapoet.*;
 
 import javax.lang.model.element.Modifier;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,8 @@ import java.util.List;
  */
 public class POJOGenerator {
 
-    public JavaFile generateByExpression (String expression) throws ClassNotFoundException{
+
+    public JavaFile generateByExpression (String expression, String packageName) throws ClassNotFoundException{
 
         //"Person#String name; int age"
         String [] expr = expression.split("#");
@@ -22,32 +24,43 @@ public class POJOGenerator {
         String classname = expr[0];
         String [] properties = expr[1].split(";");
 
-        List<FieldSpec> fieldSpecs = new ArrayList<>();
-        List<MethodSpec> methodSpecs = new ArrayList<>();
+        //List<FieldSpec>  fieldSpecs  = new ArrayList<>();
+       // List<MethodSpec> methodSpecs = new ArrayList<>();
 
         TypeSpec.Builder helloWorld = TypeSpec.classBuilder(classname)
                 .addModifiers(Modifier.PUBLIC);
 
+
+
         for (String str:properties){
             String fieldKV [] = str.trim().split(" ");
 
-            //Class<?> clazz = Class.forName(fieldKV[0]);
+            String name = fieldKV[1];
 
-            FieldSpec fieldSpec= FieldSpec.builder(int.class, fieldKV[1], Modifier.PRIVATE).build();
+            ClassName className = ClassName.get("",fieldKV[0]);
+
+            FieldSpec fieldSpec= FieldSpec.builder(className, name, Modifier.PRIVATE).build();
             helloWorld.addField(fieldSpec);
-        }
 
-//        MethodSpec main = MethodSpec.methodBuilder("main")
-//                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-//                .returns(void.class)
-//                .addParameter(String[].class, "args")
-//                .addStatement("$T.out.println($S)", System.class, "Hello, JavaPoet!")
-//                .build();
-        TypeSpec spec = helloWorld.build();
-
-        JavaFile javaFile = JavaFile.builder("com.example.helloworld", spec)
+            MethodSpec getter = MethodSpec.methodBuilder("get"+name)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(className)
+                .addStatement("return  "+name)
                 .build();
 
+            MethodSpec setter = MethodSpec.methodBuilder("set"+name)
+                    .addModifiers(Modifier.PUBLIC)
+                    .returns(void.class)
+                    .addParameter(className, name)
+                    .addStatement("this."+name+"="+name)
+                    .build();
+
+            helloWorld.addMethod(setter);
+            helloWorld.addMethod(getter);
+        }
+
+        TypeSpec spec = helloWorld.build();
+        JavaFile javaFile = JavaFile.builder(packageName, spec).build();
         return javaFile;
     }
 

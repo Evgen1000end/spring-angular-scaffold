@@ -16,10 +16,8 @@ public class POJOGeneratorTest {
     public void firstTest() throws ClassNotFoundException{
 
         POJOGenerator generator = new POJOGenerator();
-        JavaFile javaFile = generator.generateByExpression("Person#java.lang.String name; java.lang.int age");
-
+        JavaFile javaFile = generator.generateByExpression("Person#String name; Integer age", "ru.demkin");
         System.out.println(javaFile);
 
     }
-
 }
