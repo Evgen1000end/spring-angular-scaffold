@@ -15,7 +15,6 @@ import java.util.List;
  */
 public class POJOGenerator {
 
-
     public JavaFile generateByExpression (String expression, String packageName) throws ClassNotFoundException{
 
         //"Person#String name; int age"
@@ -24,13 +23,8 @@ public class POJOGenerator {
         String classname = expr[0];
         String [] properties = expr[1].split(";");
 
-        //List<FieldSpec>  fieldSpecs  = new ArrayList<>();
-       // List<MethodSpec> methodSpecs = new ArrayList<>();
-
         TypeSpec.Builder helloWorld = TypeSpec.classBuilder(classname)
                 .addModifiers(Modifier.PUBLIC);
-
-
 
         for (String str:properties){
             String fieldKV [] = str.trim().split(" ");
@@ -60,7 +54,7 @@ public class POJOGenerator {
         }
 
         TypeSpec spec = helloWorld.build();
-        JavaFile javaFile = JavaFile.builder(packageName, spec).build();
+        JavaFile javaFile = JavaFile.builder(packageName+".model", spec).build();
         return javaFile;
     }
 
